@@ -23,8 +23,8 @@ products.forEach((product) => {
             $${((product.priceCents)/100).toFixed(2)}
           </div>
 
-          <div class="product-quantity-container js-product-quantity">
-            <select>
+          <div class="product-quantity-container">
+            <select class="js-product-quantity-${product.id}">
               <option selected value="1">1</option>
               <option value="2">2</option>
               <option value="3">3</option>
@@ -40,7 +40,7 @@ products.forEach((product) => {
 
           <div class="product-spacer"></div>
 
-          <div class="added-to-cart">
+          <div class="added-to-cart js-added-${product.id}">
             <img src="images/icons/checkmark.png">
             Added
           </div>
@@ -57,6 +57,7 @@ document.querySelectorAll('.js-add-to-cart').forEach((button) => {
     button.addEventListener('click', () => {
         const id = button.dataset.productId;
         let matchingItem;
+        const quantity = Number(document.querySelector(`.js-product-quantity-${id}`).value);
 
         cart.forEach((items) => {
             if (id === items.id) {
@@ -65,12 +66,35 @@ document.querySelectorAll('.js-add-to-cart').forEach((button) => {
         });
 
         if (matchingItem) {
-            matchingItem.quantity += 1;
+            matchingItem.quantity += quantity;
         }else{
             cart.push({
                 id: id,
-                quantity: 1
+                quantity: quantity
             })
         }
+
+        let cartQuantity = 0;
+
+        cart.forEach((items) => {
+            cartQuantity += items.quantity;
+        })
+
+        document.querySelector('.js-cart-quantity').innerHTML = cartQuantity;
+
+        let timeoutId;
+        document.querySelector(`.js-added-${id}`).classList.add('view');
+
+        if (timeoutId) {
+            clearTimeout(timeoutId);
+        }
+
+        timeoutId = setTimeout(() => {
+            document.querySelector(`.js-added-${id}`).classList.remove('view');
+        }, 2000);
+
+        console.log(timeoutId);
+
+        console.log(cart);
     })
-})
+});
