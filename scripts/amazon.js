@@ -1,3 +1,6 @@
+import {cart} from '../data/cart.js';
+import { products } from '../data/products.js';
+
 let productHTML = '';
 
 products.forEach((product) => {
@@ -53,35 +56,42 @@ products.forEach((product) => {
 
 document.querySelector('.js-products-grid').innerHTML = productHTML;
 
+function addToCart(id) {
+  let matchingItem;
+  const quantity = Number(document.querySelector(`.js-product-quantity-${id}`).value);
+
+  cart.forEach((items) => {
+      if (id === items.id) {
+          matchingItem = items;
+      }
+  });
+
+  if (matchingItem) {
+      matchingItem.quantity += quantity;
+  }else{
+      cart.push({
+          id: id,
+          quantity: quantity
+      })
+  }
+}
+
+function updateCartQuantity() {
+  let cartQuantity = 0;
+
+  cart.forEach((items) => {
+      cartQuantity += items.quantity;
+  })
+
+  document.querySelector('.js-cart-quantity').innerHTML = cartQuantity;
+}
+
 document.querySelectorAll('.js-add-to-cart').forEach((button) => {
     button.addEventListener('click', () => {
         const id = button.dataset.productId;
-        let matchingItem;
-        const quantity = Number(document.querySelector(`.js-product-quantity-${id}`).value);
-
-        cart.forEach((items) => {
-            if (id === items.id) {
-                matchingItem = items;
-            }
-        });
-
-        if (matchingItem) {
-            matchingItem.quantity += quantity;
-        }else{
-            cart.push({
-                id: id,
-                quantity: quantity
-            })
-        }
-
-        let cartQuantity = 0;
-
-        cart.forEach((items) => {
-            cartQuantity += items.quantity;
-        })
-
-        document.querySelector('.js-cart-quantity').innerHTML = cartQuantity;
-
+        addToCart(id);
+        updateCartQuantity();
+        // Added to cart msg 
         let timeoutId;
         document.querySelector(`.js-added-${id}`).classList.add('view');
 
@@ -92,9 +102,5 @@ document.querySelectorAll('.js-add-to-cart').forEach((button) => {
         timeoutId = setTimeout(() => {
             document.querySelector(`.js-added-${id}`).classList.remove('view');
         }, 2000);
-
-        console.log(timeoutId);
-
-        console.log(cart);
     })
 });
